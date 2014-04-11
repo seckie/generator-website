@@ -1,0 +1,12 @@
+{
+  "name": "package-name",
+  "version": "0.0.0",
+  "dependencies": { },
+  "private": true,
+  "devDependencies": {
+    "jquery": "~2.1.0",
+    "jquery-1.11.0": "http://code.jquery.com/jquery-1.11.0.min.js",
+    "underscore": "~1.6.0",
+    "backbone": "~1.1.2"
+  }
+}
