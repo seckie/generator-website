@@ -1,10 +1,13 @@
 module.exports = (grunt) ->
-  grunt.loadNpmTasks('grunt-contrib-coffee')
-  grunt.loadNpmTasks('grunt-coffeelint')
-  grunt.loadNpmTasks('grunt-contrib-compass')
-  grunt.loadNpmTasks('grunt-contrib-copy')
-  grunt.loadNpmTasks('grunt-contrib-rename')
-  grunt.loadNpmTasks('grunt-contrib-watch')
+  grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-coffeelint'
+  grunt.loadNpmTasks 'grunt-contrib-compass'
+  grunt.loadNpmTasks 'grunt-contrib-copy'
+  grunt.loadNpmTasks 'grunt-contrib-rename'
+  grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-contrib-concat'
+  grunt.loadNpmTasks 'grunt-contrib-uglify'
+  grunt.loadNpmTasks 'grunt-contrib-jshint'
 
   grunt.initConfig(
     pkg: grunt.file.readJSON('package.json')
@@ -12,12 +15,11 @@ module.exports = (grunt) ->
       main:
         options:
           bare: true
-        expand: true
-        flatten: true
-        cwd: '_coffee/'
-        src: [ '*.coffee' ]
-        dest: 'app/js/'
-        ext: '.js'
+        files:
+          'app/js/script.js': [
+            # join
+            'coffee/script.coffee'
+          ]
     coffeelint:
       # DOC: https://github.com/vojtajina/grunt-coffeelint
       # DOC: http://www.coffeelint.org/
@@ -46,6 +48,26 @@ module.exports = (grunt) ->
           outputStyle: 'compact'
           noLineComments: true
           assetCacheBuster: false
+    concat:
+      libs:
+        src: [
+          'bower_components/underscore/underscore.js'
+          'bower_components/backbone/backbone.js'
+        ]
+        dest: 'tmp/libs.min.js'
+    uglify:
+      options:
+        mangle: false
+        preserveComments: 'some'
+      libs:
+        files: [
+          {
+            expand: true
+            cwd: 'tmp/'
+            src: [ '*.js' ]
+            dest: 'app/js/'
+          }
+        ]
     copy:
       main:
         files: [
@@ -92,10 +114,20 @@ module.exports = (grunt) ->
       scss:
         files: [ '_scss/*.scss' ]
         tasks: [ 'compass:dev' ]
+      html:
+        options:
+          livereload: true
+        files: [ 'app/**/*.html' ]
+      css:
+        options:
+          livereload: true
+        files: [ 'app/css/*' ]
       js:
+        options:
+          livereload: true
         files: [ 'app/js/*' ]
         tasks: [ 'jshint' ]
   )
 
   grunt.registerTask('default', [ 'coffee', 'compass:dev', 'watch' ])
-  grunt.registerTask('deploy', [ 'copy', 'rename', 'coffee', 'compass:pro' ])
+  grunt.registerTask 'deploy', [ 'concat', 'uglify', 'copy', 'rename', 'coffee', 'compass:pro' ]
