@@ -16,7 +16,7 @@ module.exports = (grunt) ->
         options:
           bare: true
         files:
-          'app/js/script.js': [
+          'public_html/js/script.js': [
             # join
             'coffee/script.coffee'
           ]
@@ -33,8 +33,8 @@ module.exports = (grunt) ->
       options:
         httpPath: '/' # You have to reconfigure this option
         sassDir: '_scss'
-        cssDir: 'app/css'
-        imagesDir: 'app/img'
+        cssDir: 'public_html/css'
+        imagesDir: 'public_html/img'
         relativeAssets: true
       dev:
         options:
@@ -65,7 +65,7 @@ module.exports = (grunt) ->
             expand: true
             cwd: 'tmp/'
             src: [ '*.js' ]
-            dest: 'app/js/'
+            dest: 'public_html/js/'
           }
         ]
     copy:
@@ -75,33 +75,33 @@ module.exports = (grunt) ->
             expand: true
             cwd: 'bower_components/jquery/dist/'
             src: [ 'jquery.min.js' ]
-            dest: 'app/js/'
+            dest: 'public_html/js/'
           }
           {
             expand: true
             cwd: 'bower_components/jquery-1.11.0/'
             src: [ 'index.js' ]
-            dest: 'app/js/'
+            dest: 'public_html/js/'
           }
           {
             expand: true
             cwd: 'bower_components/underscore/'
             src: [ 'underscore.js' ]
-            dest: 'app/js/'
+            dest: 'public_html/js/'
           }
           {
             expand: true
             cwd: 'bower_components/backbone/'
             src: [ 'backbone.js' ]
-            dest: 'app/js/'
+            dest: 'public_html/js/'
           }
         ]
     rename:
       main:
         files: [
           {
-            src: [ 'app/js/index.js' ]
-            dest: 'app/js/jquery-1.11.0.min.js'
+            src: [ 'public_html/js/index.js' ]
+            dest: 'public_html/js/jquery-1.11.0.min.js'
           }
         ]
     watch:
@@ -117,15 +117,15 @@ module.exports = (grunt) ->
       html:
         options:
           livereload: true
-        files: [ 'app/**/*.html' ]
+        files: [ 'public_html/**/*.html' ]
       css:
         options:
           livereload: true
-        files: [ 'app/css/*' ]
+        files: [ 'public_html/css/*' ]
       js:
         options:
           livereload: true
-        files: [ 'app/js/*' ]
+        files: [ 'public_html/js/*' ]
         tasks: [ 'jshint' ]
   )
 

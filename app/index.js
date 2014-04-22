@@ -40,8 +40,10 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
   },
 
   app: function () {
-    this.mkdir('app');
-    this.mkdir('app/templates');
+    this.mkdir('public_html');
+    this.mkdir('public_html/img');
+    this.mkdir('public_html/css');
+    this.mkdir('public_html/js');
 
     this.copy('_package.json', 'package.json');
     this.copy('_bower.json', 'bower.json');
