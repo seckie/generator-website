@@ -17,15 +17,5 @@
   "strict": true,
   "trailing": true,
   "smarttabs": true,
-  "white": true,
-  "globals": {
-    "window": true,
-    "document": true,
-    "jQuery": true,
-    "$": true,
-    "_": true,
-    "Backbone": true
-  },
-  "-W116": true,
-  "-W041": true
+  "white": true
 }
