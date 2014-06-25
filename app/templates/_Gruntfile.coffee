@@ -1,4 +1,7 @@
 module.exports = (grunt) ->
+  # require it at the top and pass in the grunt instance
+  #require('time-grunt')(grunt)
+
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-contrib-compass'
@@ -29,6 +32,11 @@ module.exports = (grunt) ->
         options:
           'no_trailing_whitespace':
             'level': 'error'
+    jshint:
+      main:
+        options:
+          jshintrc: true
+        src: [ 'public_html/js/script.js' ]
     compass:
       options:
         httpPath: '/' # You have to reconfigure this option
