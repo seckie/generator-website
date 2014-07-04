@@ -148,22 +148,27 @@ gulp.task('copy', () ->
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 )
 
+###
+ * watch
+###
+gulp.task('watch', () ->
+  gulp.watch(paths.coffee, [
+    'coffee'
+  ])
+  gulp.watch(paths.scss, [
+    'compassDev'
+  ])
+)
 
 ###
- * watch & command
+ * command
 ###
-
-gulp.watch(paths.coffee, [
-  'coffee'
-])
-gulp.watch(paths.scss, [
-  'compassDev'
-])
 
 gulp.task('default', [
   'coffee'
   'jshint'
   'compassDev'
+  'watch'
 ])
 
 gulp.task('deploy', [
