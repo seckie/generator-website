@@ -35,27 +35,23 @@ paths = {
  * Coffee Script
 ###
 
-coffeeStream = coffee({ bare: true }).on('error', (err) ->
-  gutil.log(err)
-  coffeeStream.end()
-)
-
-coffeelintStream = coffeelint(
-  'no_trailing_whitespace':
-    'level': 'error'
-)
-
-coffeelintStream.on('error', (err) ->
-  gutil.log(err)
-  coffeelintStream.end()
-)
 
 
 gulp.task('coffee', (callback) ->
+  coffeeStream = coffee({ bare: true }).on('error', (err) ->
+    gutil.log(err)
+    coffeeStream.end()
+  )
+  coffeelintStream = coffeelint(
+    'no_trailing_whitespace':
+      'level': 'error'
+  ).on('error', (err) ->
+    gutil.log(err)
+    coffeelintStream.end()
+  )
   gulp.src(paths.coffee)
     .pipe(coffeelintStream)
     .pipe(coffeelint.reporter())
-    .pipe(coffeelint.reporter('fail'))
     .pipe(coffeeStream)
     .pipe(gulp.dest('public_html/js'))
 )
@@ -65,16 +61,14 @@ gulp.task('coffee', (callback) ->
  * jshint
 ###
 
-jshintStream = jshint().on('error', (err) ->
-  gutil.log(err)
-  jshintStream.end()
-)
-
 gulp.task('jshint', (callback) ->
+  jshintStream = jshint().on('error', (err) ->
+    gutil.log(err)
+    jshintStream.end()
+  )
   gulp.src(paths.js)
     .pipe(jshintStream)
     .pipe(jshint.reporter('default'))
-    .pipe(jshint.reporter('fail'))
 )
 
 
@@ -122,7 +116,7 @@ gulp.task('styledocco', [ 'compassPro' ], (callback) ->
   gulp.src(paths.scss).pipe(stream)
 
   callback()
-)  
+)
 
 
 
