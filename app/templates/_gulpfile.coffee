@@ -84,9 +84,10 @@ gulp.task('jshint', (callback) ->
 
 gulp.task('compassDev', (callback) ->
   stream = compass(
-    config_file: './config_dev.rb'
+    config_file: './config-dev.rb'
     css: 'public_html/css'
     sass: 'src/scss'
+    bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
     gutil.log(err)
     stream.end()
@@ -98,10 +99,10 @@ gulp.task('compassDev', (callback) ->
 
 gulp.task('compassPro', (callback) ->
   stream = compass(
-    config_file: './config_pro.rb'
+    config_file: './config.rb'
     css: 'public_html/css'
     sass: 'src/scss'
-    project: path.join(__dirname)
+    bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
     gutil.log(err)
     stream.end()
@@ -176,7 +177,6 @@ gulp.task('deploy', [
   'buildLib'
   'coffee'
   'jshint'
-  'compassPro'
   'styledocco'
 ])
 
