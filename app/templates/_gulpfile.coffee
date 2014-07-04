@@ -81,7 +81,7 @@ gulp.task('compassDev', (callback) ->
     config_file: './config-dev.rb'
     css: 'public_html/css'
     sass: 'src/scss'
-    bundle_exec: true # exec with 'bundler'
+#     bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
     gutil.log(err)
     stream.end()
@@ -96,7 +96,7 @@ gulp.task('compassPro', (callback) ->
     config_file: './config.rb'
     css: 'public_html/css'
     sass: 'src/scss'
-    bundle_exec: true # exec with 'bundler'
+#     bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
     gutil.log(err)
     stream.end()
@@ -110,8 +110,13 @@ gulp.task('styledocco', [ 'compassPro' ], (callback) ->
   stream = styledocco(
     out: paths.doc
     name: '"Style Guide"'
-    preprocessor: '"scss --compass"'
+    preprocessor: '"sass --compass"'
+#     preprocessor: '"bundle exec sass --compass"'
     verbose: true
+#     include: [
+#       'public_html/fs/sp/common/css/global.css'
+#       'public_html/fs/sp/css/style.css'
+#     ]
   )
   gulp.src(paths.scss).pipe(stream)
 
@@ -148,9 +153,11 @@ gulp.task('copy', () ->
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 )
 
+
 ###
  * watch
 ###
+
 gulp.task('watch', () ->
   gulp.watch(paths.coffee, [
     'coffee'
