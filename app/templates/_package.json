@@ -10,6 +10,7 @@
     "gulp-compass": "^1.1.9",
     "gulp-concat": "^2.2.0",
     "gulp-jshint": "^1.6.3",
+    "gulp-styledocco": "0.0.1",
     "gulp-uglify": "^0.3.1",
     "gulp-util": "^2.2.17"
   }

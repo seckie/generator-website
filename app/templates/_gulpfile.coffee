@@ -7,6 +7,7 @@ compass = require('gulp-compass')
 concat = require('gulp-concat')
 uglify = require('gulp-uglify')
 jshint = require('gulp-jshint')
+styledocco = require('gulp-styledocco')
 
 path = require('path')
 fs = require('fs')
@@ -26,6 +27,7 @@ paths = {
     'bower_components/underscore/underscore.js'
     'bower_components/backbone/backbone.js'
   ]
+  doc: 'public_html/docs'
 }
 
 
@@ -47,7 +49,7 @@ coffeelintStream.on('error', (err) ->
   gutil.log(err)
   coffeelintStream.end()
 )
-  
+
 
 gulp.task('coffee', (callback) ->
   gulp.src(paths.coffee)
@@ -109,6 +111,19 @@ gulp.task('compassPro', (callback) ->
     .pipe(stream)
 )
 
+gulp.task('styledocco', [ 'compassPro' ], (callback) ->
+  stream = styledocco(
+    out: paths.doc
+    name: '"Style Guide"'
+    preprocessor: '"scss --compass"'
+    verbose: true
+  )
+  gulp.src(paths.scss).pipe(stream)
+
+  callback()
+)  
+
+
 
 ###
  * Concat
@@ -162,5 +177,6 @@ gulp.task('deploy', [
   'coffee'
   'jshint'
   'compassPro'
+  'styledocco'
 ])
 
