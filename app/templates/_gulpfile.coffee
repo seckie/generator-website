@@ -8,18 +8,19 @@ concat = require('gulp-concat')
 uglify = require('gulp-uglify')
 jshint = require('gulp-jshint')
 styledocco = require('gulp-styledocco')
+browserSync = require('browser-sync')
 
 path = require('path')
 fs = require('fs')
 
 paths = {
   coffee: [ 'src/coffee/**/*.coffee' ]
-  js: [ 'public_html/js/script.js' ]
+  js: [ 'public/js/script.js' ]
   staticJs: [
     'bower_components/jquery-1.11.1.min/index.js'
   ]
   staticJsDest: [
-    'public_html/js/jquery-1.11.1.min.js'
+    'public/js/jquery-1.11.1.min.js'
   ]
   scss: [ 'src/scss/**/*.scss' ]
   lib: [
@@ -27,7 +28,7 @@ paths = {
     'bower_components/underscore/underscore.js'
     'bower_components/backbone/backbone.js'
   ]
-  doc: 'public_html/docs'
+  doc: 'public/docs'
 }
 
 
@@ -53,7 +54,8 @@ gulp.task('coffee', (callback) ->
     .pipe(coffeelintStream)
     .pipe(coffeelint.reporter())
     .pipe(coffeeStream)
-    .pipe(gulp.dest('public_html/js'))
+    .pipe(gulp.dest('public/js'))
+    .pipe(browserSync.reload({ stream: true }))
 )
 
 
@@ -79,7 +81,7 @@ gulp.task('jshint', (callback) ->
 gulp.task('compassDev', (callback) ->
   stream = compass(
     config_file: './config-dev.rb'
-    css: 'public_html/css'
+    css: 'public/css'
     sass: 'src/scss'
 #     bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
@@ -89,12 +91,13 @@ gulp.task('compassDev', (callback) ->
 
   gulp.src(paths.scss)
     .pipe(stream)
+    .pipe(browserSync.reload({ stream: true }))
 )
 
 gulp.task('compassPro', (callback) ->
   stream = compass(
     config_file: './config.rb'
-    css: 'public_html/css'
+    css: 'public/css'
     sass: 'src/scss'
 #     bundle_exec: true # exec with 'bundler'
   ).on('error', (err) ->
@@ -104,6 +107,7 @@ gulp.task('compassPro', (callback) ->
 
   gulp.src(paths.scss)
     .pipe(stream)
+    .pipe(browserSync.reload({ stream: true }))
 )
 
 gulp.task('styledocco', [ 'compassPro' ], (callback) ->
@@ -114,8 +118,8 @@ gulp.task('styledocco', [ 'compassPro' ], (callback) ->
 #     preprocessor: '"bundle exec sass --compass"'
     verbose: true
 #     include: [
-#       'public_html/fs/sp/common/css/global.css'
-#       'public_html/fs/sp/css/style.css'
+#       'public/fs/sp/common/css/global.css'
+#       'public/fs/sp/css/style.css'
 #     ]
   )
   gulp.src(paths.scss).pipe(stream)
@@ -138,7 +142,8 @@ gulp.task('buildLib', () ->
   gulp.src(paths.lib)
     .pipe(concatStream)
     .pipe(uglifyStream)
-    .pipe(gulp.dest('public_html/js/'))
+    .pipe(gulp.dest('public/js/'))
+    .pipe(browserSync.reload({ stream: true }))
 )
 
 
@@ -153,19 +158,16 @@ gulp.task('copy', () ->
     fs.createReadStream(src).pipe(fs.createWriteStream(dest))
 )
 
-
 ###
- * watch
+ * server
 ###
-
-gulp.task('watch', () ->
-  gulp.watch(paths.coffee, [
-    'coffee'
-  ])
-  gulp.watch(paths.scss, [
-    'compassDev'
-  ])
+gulp.task('browser-sync', () ->
+  browserSync(
+    server:
+      baseDir: './public'
+  )
 )
+
 
 ###
  * command
@@ -175,8 +177,18 @@ gulp.task('default', [
   'coffee'
   'jshint'
   'compassDev'
-  'watch'
-])
+], () ->
+  # watch
+  gulp.watch(paths.coffee, [
+    'coffee',
+     browserSync.reload
+  ])
+  gulp.watch(paths.scss, [
+    'compassDev',
+     browserSync.reload
+  ])
+  gulp.watch(paths.html).on('change', browserSync.reload)
+)
 
 gulp.task('deploy', [
   'copy'
