@@ -20,14 +20,15 @@ html(lang="ja", class=rootClass)
     link(rel="stylesheet", href="/css/style.css")
     block head
       link(rel="stylesheet", href="/css/style.css")
-      script(src="/js/lib.js")
       - if (build == true)
         //- buildモードの場合
-        script(src="/js/common.js")
+        script(src="/js/lib.js")
+        script(src="/js/bundle.js")
       - else
         //- developmentモードの場合
-        script(src="/special/styling/js/my-script.js")
-        script(src="/special/styling/js/my-script2.js")
+        script(src="/js/lib.js")
+        script(src="/js/main.js")
+        script(src="/js/script.js")
     block analytics
       //
         script.
