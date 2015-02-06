@@ -3,198 +3,296 @@ gutil = require('gulp-util')
 
 coffee = require('gulp-coffee')
 coffeelint = require('gulp-coffeelint')
-compass = require('gulp-compass')
 concat = require('gulp-concat')
 uglify = require('gulp-uglify')
 jshint = require('gulp-jshint')
-styledocco = require('gulp-styledocco')
-browserSync = require('browser-sync')
+stylus = require('gulp-stylus')
+nib = require('nib')
+jade = require('gulp-jade')
+karma = require('karma').server
 
-path = require('path')
+browserSync = require('browser-sync')
 fs = require('fs')
 
+publicDir = 'public/'
+
 paths = {
-  coffee: [ 'src/coffee/**/*.coffee' ]
-  js: [ 'public/js/script.js' ]
-  staticJs: [
-    'bower_components/jquery-1.11.1.min/index.js'
+  jade: [
+    'src/jade/*.jade'
+    'src/jade/!(include)/*.jade'
   ]
-  staticJsDest: [
-    'public/js/jquery-1.11.1.min.js'
+  html: [
+    publicDir + '**/*.html'
   ]
-  scss: [ 'src/scss/**/*.scss' ]
+  htmlDir: publicDir
+  coffee: [
+    'src/coffee/**/*.coffee'
+  ]
+  js: [
+    publicDir + 'js/**/*.js'
+  ]
+  jsDir: publicDir + 'js'
+  coffeeSpec: [
+    'src/spec/**/*.coffee'
+  ]
+  spec: [
+    'spec/**/*.js'
+  ]
+  specDir: 'spec'
+  stylus: [ 'src/stylus/**/*.styl' ]
+  cssDir: publicDir + 'css'
   lib: [
     'bower_components/jquery/dist/jquery.min.js'
     'bower_components/underscore/underscore.js'
     'bower_components/backbone/backbone.js'
   ]
-  doc: 'public/docs'
+  libName: 'lib.js'
+  copySrc: []
+  copyDest: []
+  spriteImg: [
+    'src/sprite/*'
+  ]
+  spriteImgName: [
+    'main.png'
+  ]
+  spriteCSSName: [
+    'sprite-main.styl'
+  ]
+  spriteImgDest: publicDir + 'img/sprite'
+  spriteCSSDest: 'src/stylus/sprite'
 }
 
+errorHandler = (e) ->
+  gutil.log('Handled error:', e.name, ':', e.message, ', stack:', e.stack)
+
 
 ###
- * Coffee Script
+  jade
 ###
-
-
-
-gulp.task('coffee', (callback) ->
-  coffeeStream = coffee({ bare: true }).on('error', (err) ->
-    gutil.log(err)
-    coffeeStream.end()
-  )
-  coffeelintStream = coffeelint(
-    'no_trailing_whitespace':
-      'level': 'error'
-  ).on('error', (err) ->
-    gutil.log(err)
-    coffeelintStream.end()
-  )
-  gulp.src(paths.coffee)
-    .pipe(coffeelintStream)
-    .pipe(coffeelint.reporter())
-    .pipe(coffeeStream)
-    .pipe(gulp.dest('public/js'))
-    .pipe(browserSync.reload({ stream: true }))
+jadeLocalVar = {
+  build: false
+}
+gulp.task('jade-before-build', (cb) ->
+  jadeLocalVar.build = true
+  cb()
+)
+gulp.task('jade', () ->
+  gulp.src(paths.jade)
+    .pipe(jade(
+        pretty: true
+        locals: jadeLocalVar
+      ).on('error', errorHandler))
+    .pipe(gulp.dest(paths.htmlDir))
 )
 
 
 ###
- * jshint
+  Coffee Script
 ###
 
-gulp.task('jshint', (callback) ->
-  jshintStream = jshint().on('error', (err) ->
-    gutil.log(err)
-    jshintStream.end()
-  )
+gulp.task('coffee', () ->
+  gulp.src(paths.coffee)
+    .pipe(coffee().on('error', errorHandler))
+    .pipe(coffeelint(
+        'no_trailing_whitespace':
+          'level': 'error'
+      ).on('error', errorHandler))
+    .pipe(gulp.dest(paths.jsDir))
+    .pipe(browserSync.reload({ stream: true }))
+)
+gulp.task('coffee-spec', () ->
+  gulp.src(paths.coffeeSpec)
+    .pipe(coffee(
+        bare: true
+      ).on('error', errorHandler))
+    .pipe(coffeelint(
+        'no_trailing_whitespace':
+          'level': 'error'
+      ).on('error', errorHandler))
+    .pipe(gulp.dest(paths.specDir))
+)
+
+
+###
+  jshint
+###
+
+gulp.task('jshint', () ->
   gulp.src(paths.js)
-    .pipe(jshintStream)
+    .pipe(jshint().on('error', errorHandler))
     .pipe(jshint.reporter('default'))
 )
 
 
 ###
- * Sass & Compass
+  test
+###
+#
+gulp.task('test', (cb) ->
+  gulp.src(paths.spec)
+    .pipe(jasmine())
+  karma.start(
+    configFile: __dirname + '/karma.conf.js'
+    singleRun: true
+  , cb)
+)
+gulp.task('tdd', (cb) ->
+  karma.start(
+    configFile: __dirname + '/karma.conf.js'
+  , cb)
+)
+
+
+###
+  stylus
 ###
 
-gulp.task('compassDev', (callback) ->
-  stream = compass(
-    config_file: './config-dev.rb'
-    css: 'public/css'
-    sass: 'src/scss'
-#     bundle_exec: true # exec with 'bundler'
-  ).on('error', (err) ->
-    gutil.log(err)
-    stream.end()
-  )
-
-  gulp.src(paths.scss)
-    .pipe(stream)
+gulp.task('stylus', () ->
+  gulp.src(paths.stylus)
+    .pipe(stylus(
+      use: [ nib() ]
+    ).on('error', errorHandler))
+    .pipe(gulp.dest(paths.cssDir))
     .pipe(browserSync.reload({ stream: true }))
 )
 
-gulp.task('compassPro', (callback) ->
-  stream = compass(
-    config_file: './config.rb'
-    css: 'public/css'
-    sass: 'src/scss'
-#     bundle_exec: true # exec with 'bundler'
-  ).on('error', (err) ->
-    gutil.log(err)
-    stream.end()
-  )
 
-  gulp.src(paths.scss)
-    .pipe(stream)
-    .pipe(browserSync.reload({ stream: true }))
-)
+###
+  sprite
+###
 
-gulp.task('styledocco', [ 'compassPro' ], (callback) ->
-  stream = styledocco(
-    out: paths.doc
-    name: '"Style Guide"'
-    preprocessor: '"sass --compass"'
-#     preprocessor: '"bundle exec sass --compass"'
-    verbose: true
-#     include: [
-#       'public/fs/sp/common/css/global.css'
-#       'public/fs/sp/css/style.css'
-#     ]
-  )
-  gulp.src(paths.scss).pipe(stream)
-
-  callback()
+gulp.task('sprite-base', (cb) ->
+  path = (paths.spriteImgDest).replace(publicDir, '/')
+  for src, i in paths.spriteImg
+    stream = spritesmith(
+      imgName: paths.spriteImgName[i]
+      cssName: paths.spriteCSSName[i]
+      imgPath: path + '/' + paths.spriteImgName[i]
+      algorithm: 'binary-tree'
+      engine: 'gmsmith'
+      imgOpts: {exportOpts: {quality: 100}}
+      padding: 2
+    ).on('error', errorHandler)
+    spriteData = gulp.src(src).pipe(stream)
+    spriteData.img.pipe(gulp.dest(paths.spriteImgDest))
+    spriteData.css.pipe(gulp.dest(paths.spriteCSSDest))
+  cb()
 )
 
 
 
 ###
- * Concat
+  Concat
 ###
 
-gulp.task('buildLib', () ->
-  concatStream = concat('lib.js')
-  uglifyStream = uglify(
-    mangle: false
-    preserveComments: 'all'
-  )
+gulp.task('build-lib', () ->
   gulp.src(paths.lib)
-    .pipe(concatStream)
-    .pipe(uglifyStream)
-    .pipe(gulp.dest('public/js/'))
-    .pipe(browserSync.reload({ stream: true }))
+    .pipe(concat(paths.libName))
+    .pipe(uglify(
+      mangle: false
+      preserveComments: 'all'
+    ))
+    .pipe(gulp.dest(paths.jsDir))
 )
 
 
 ###
- * Copy
+  copy
 ###
 
 gulp.task('copy', () ->
-  for sr, i in paths.staticJs
-    src = paths.staticJs[i]
-    dest = paths.staticJsDest[i]
-    fs.createReadStream(src).pipe(fs.createWriteStream(dest))
+  for src, i in paths.copySrc
+    dest = paths.copyDest[i]
+    fs.createReadStream(src)
+      .pipe(fs.createWriteStream(dest))
 )
 
 ###
- * server
+  server
 ###
 gulp.task('browser-sync', () ->
   browserSync(
     server:
       baseDir: './public'
+    startPath: '/'
   )
 )
 
 
 ###
- * command
+  watch
 ###
+gulp.task('watch', (cb) ->
+  gutil.log('start watching')
+  # coffee
+  gulp.watch(paths.coffee).on('change', (e) ->
+    filename = e.path.replace(__dirname + '/src/coffee/', '')
+    srcPath = e.path.replace(__dirname + '/', '')
+    destPath = e.path.replace(__dirname + '/src/coffee', paths.jsDir).replace('/' + filename, '')
+    gutil.log('Coffee file changed.')
+    gulp.src(srcPath)
+      .pipe(coffee().on('error', errorHandler))
+      .pipe(gulp.dest(destPath))
+      .pipe(browserSync.reload({ stream: true }))
+  )
+  # coffee spec
+  gulp.watch(paths.coffeeSpec).on('change', (e) ->
+    filename = e.path.replace(__dirname + '/src/spec/', '')
+    srcPath = e.path.replace(__dirname + '/', '')
+    destPath = e.path.replace(__dirname + '/src/spec', paths.specDir).replace('/' + filename, '')
+    gutil.log('Coffee-Spec file changed.')
+    gulp.src(srcPath)
+      .pipe(coffee(
+          bare: true
+        ).on('error', errorHandler))
+      .pipe(gulp.dest(destPath))
+      .pipe(browserSync.reload({ stream: true }))
+  )
 
-gulp.task('default', [
-  'coffee'
-  'jshint'
-  'compassDev'
-], () ->
-  # watch
-  gulp.watch(paths.coffee, [
-    'coffee',
-     browserSync.reload
+  # stylus
+  gulp.watch(paths.stylus).on('change', (e) ->
+    filename = e.path.replace(__dirname + '/src/stylus/', '')
+    srcPath = e.path.replace(__dirname + '/', '')
+    destPath = e.path.replace(__dirname + '/src/stylus', paths.cssDir).replace('/' + filename, '')
+    gutil.log('Stylus file changed.')
+    gulp.src(srcPath)
+      .pipe(stylus(
+          use: [ nib() ]
+        ).on('error', errorHandler))
+      .pipe(gulp.dest(destPath))
+      .pipe(browserSync.reload({ stream: true }))
+  )
+  # jade
+  gulp.watch(paths.jade, [
+    'jade'
   ])
-  gulp.watch(paths.scss, [
-    'compassDev',
-     browserSync.reload
-  ])
-  gulp.watch(paths.html).on('change', browserSync.reload)
+  gulp.watch(paths.html).on('change', () ->
+    browserSync.reload()
+  )
+  cb()
 )
 
+
+
+###
+ * command
+###
+#
+gulp.task('default', [
+  'browser-sync'
+  'watch'
+  'tdd'
+])
+
 gulp.task('deploy', [
-  'copy'
-  'buildLib'
+  'jade-before-build'
+  'jade'
+  'build-lib'
   'coffee'
-  'jshint'
-  'styledocco'
+  'coffee-spec'
+  'stylus'
+])
+gulp.task('sprite', [
+  'sprite-base'
 ])
 

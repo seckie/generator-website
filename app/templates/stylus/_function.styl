@@ -1,0 +1,32 @@
+/**
+ * function
+ */
+
+// utility functions
+
+half($number)
+  if $number is auto
+    $number
+  else if unit($number) is "%"
+    // 単位が"%"なら何もしない
+    $number
+  else
+    ($number / 2)
+
+
+// 単位を削る
+strip-units($number)
+  $number / ($number * 0 + 1)
+
+// パーセント表示
+// basePx(== 640px)を100%とする
+//
+// 親要素のサイズが300pxの場合
+// @include per(200px, 300px);
+//
+per($px, $basePx = 640px)
+  floor(strip-units($px / $basePx), 4) * 100%
+
+// em 単位計算
+em($px, $basePx = 10px)
+  floor(strip-units($px / $basePx), 2) * 1em

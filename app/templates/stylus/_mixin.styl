@@ -1,0 +1,109 @@
+/**
+ * Mixin
+ */
+
+// sprite
+sprite-extend($sprite)
+  spritePosition($sprite)
+  spriteWidth($sprite)
+  spriteHeight($sprite)
+
+// sprite for retina
+spriteWidth-x2($sprite)
+  width: ($sprite[4] / 2);
+
+spriteHeight-x2($sprite)
+  height: ($sprite[5] / 2);
+
+spritePosition-x2($sprite)
+  background-position: ($sprite[2] / 2) ($sprite[3] / 2);
+
+spriteImage-x2($sprite)
+  background-image: url($sprite[8]);
+
+spriteSize-x2($sprite)
+  background-size: ($sprite[6] / 2) ($sprite[7] / 2)
+
+sprite-x2($sprite)
+  spriteImage-x2($sprite)
+  spritePosition-x2($sprite)
+  spriteSize-x2($sprite)
+  spriteWidth-x2($sprite)
+  spriteHeight-x2($sprite)
+
+sprite-extend-x2($sprite)
+  spritePosition-x2($sprite)
+  spriteWidth-x2($sprite)
+  spriteHeight-x2($sprite)
+
+// sprite
+spriteWidth-xn($sprite, n)
+  if $sprite[4] != 0px or $sprite[4] != 0
+    width: ($sprite[4] / n);
+  else
+    width: 0;
+
+spriteHeight-xn($sprite, n)
+  if $sprite[5] != 0px or $sprite[5] != 0
+    height: ($sprite[5] / n);
+  else
+    height: 0;
+
+spritePosition-xn($sprite, n)
+  if $sprite[2] != 0px or $sprite[2] != 0
+    x = $sprite[2] / n
+  else
+    x = 0
+  if $sprite[3] != 0px or $sprite[3] != 0
+    y = $sprite[3] / n
+  else
+    y = 0
+  background-position: x y
+
+spriteImage-xn($sprite)
+  background-image: url($sprite[8]);
+
+spriteSize-xn($sprite, n)
+  if $sprite[6] != 0px or $sprite[6] != 0
+    w = $sprite[6] / n
+  else
+    w = 0
+  if $sprite[7] != 0px or $sprite[7] != 0
+    h = $sprite[7] / n
+  else
+    h = 0
+  background-size: w h
+
+sprite-xn($sprite, n)
+  spriteImage-xn($sprite, n)
+  spritePosition-xn($sprite, n)
+  spriteSize-xn($sprite, n)
+  spriteWidth-xn($sprite, n)
+  spriteHeight-xn($sprite, n)
+
+sprite-extend-xn($sprite, n)
+  spritePosition-xn($sprite, n)
+  spriteWidth-xn($sprite, n)
+  spriteHeight-xn($sprite, n)
+
+// font
+
+// font-size: rem, line-height: unitless
+font($px-size, $px-lh)
+  $size = strip-units($px-size)
+  $lh =  strip-units($px-lh)
+  font-size: 1rem * floor($size / 10, 2)
+  line-height: floor($lh / $size, 2)
+
+retina-font($px-size, $px-lh)
+  $size = (strip-units($px-size) / 2)
+  $lh = (strip-units($px-lh) / 2)
+  font-size: floor(1rem * ($size / 10), 2)
+  line-height: floor($lh / $size, 2)
+
+// other
+hide-text($ta = 0)
+  overflow: hidden
+  text-indent: -9999px
+  if $ta isnt 0
+    text-align: $ta
