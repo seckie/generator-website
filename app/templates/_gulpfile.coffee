@@ -11,6 +11,9 @@ nib = require('nib')
 jade = require('gulp-jade')
 karma = require('karma').server
 
+browserify = require('browserify')
+source = require('vinyl-source-stream')
+
 browserSync = require('browser-sync')
 fs = require('fs')
 
@@ -28,10 +31,12 @@ paths = {
   coffee: [
     'src/coffee/**/*.coffee'
   ]
+  coffeeMain: './src/coffee/main.coffee'
   js: [
     publicDir + 'js/**/*.js'
   ]
   jsDir: publicDir + 'js'
+  bundleName: 'bundle.js'
   coffeeSpec: [
     'src/spec/**/*.coffee'
   ]
@@ -91,12 +96,22 @@ gulp.task('jade', () ->
 ###
 
 gulp.task('coffee', () ->
-  gulp.src(paths.coffee)
-    .pipe(coffee().on('error', errorHandler))
-    .pipe(coffeelint(
-        'no_trailing_whitespace':
-          'level': 'error'
-      ).on('error', errorHandler))
+#   gulp.src(paths.coffee)
+#     .pipe(coffee().on('error', errorHandler))
+#     .pipe(coffeelint(
+#         'no_trailing_whitespace':
+#           'level': 'error'
+#       ).on('error', errorHandler))
+#     .pipe(gulp.dest(paths.jsDir))
+#     .pipe(browserSync.reload({ stream: true }))
+  browserify(
+      entries: [ paths.coffeeMain ]
+      extensions: [ '.coffee' ]
+      debug: true
+    )
+    .transform('coffeeify')
+    .bundle().on('error', errorHandler)
+    .pipe(source(paths.bundleName))
     .pipe(gulp.dest(paths.jsDir))
     .pipe(browserSync.reload({ stream: true }))
 )
