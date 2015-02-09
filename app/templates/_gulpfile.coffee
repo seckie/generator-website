@@ -10,6 +10,7 @@ stylus = require('gulp-stylus')
 nib = require('nib')
 jade = require('gulp-jade')
 karma = require('karma').server
+notify = require('gulp-notify')
 
 browserify = require('browserify')
 source = require('vinyl-source-stream')
@@ -68,7 +69,13 @@ paths = {
 }
 
 errorHandler = (e) ->
-  gutil.log('Handled error:', e.name, ':', e.message, ', stack:', e.stack)
+  args = Array.prototype.slice.call(arguments)
+  notify.onError(
+    title: 'Compile Error'
+    message: '<%= error %>'
+    sound: false
+  ).apply(@, args)
+  @.emit('end')
 
 
 ###
@@ -110,7 +117,8 @@ gulp.task('coffee', () ->
       debug: true
     )
     .transform('coffeeify')
-    .bundle().on('error', errorHandler)
+    .bundle()
+    .on('error', errorHandler)
     .pipe(source(paths.bundleName))
     .pipe(gulp.dest(paths.jsDir))
     .pipe(browserSync.reload({ stream: true }))
