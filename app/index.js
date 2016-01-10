@@ -48,7 +48,7 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
 
     this.copy('_package.json', 'package.json');
     //this.copy('_Gruntfile.coffee', 'Gruntfile.coffee');
-    this.copy('_gulpfile.coffee', 'gulpfile.coffee');
+    this.copy('gulpfile.js', 'gulpfile.js');
     this.copy('_karma.conf.coffee', 'karma.conf.coffee');
   },
 
