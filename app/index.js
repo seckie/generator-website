@@ -10,7 +10,7 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
     this.pkg = require('../package.json');
 
     this.on('end', function () {
-      if (!this.options['skip-install']) {
+      if (this.options['install-modules']) {
         this.installDependencies();
       }
     });
@@ -27,9 +27,9 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
 
     var prompts = [{
       type: 'confirm',
-      name: 'someOption',
-      message: 'Would you like to enable this option?',
-      default: true
+      name: 'install-modules',
+      message: 'Would you like to install npm modules right now?',
+      default: false
     }];
 
     this.prompt(prompts, function (props) {
