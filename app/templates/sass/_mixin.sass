@@ -1,0 +1,99 @@
+//
+// Mixin
+//
+
+// sprite
+=sprite-extend($sprite)
+  +sprite-position($sprite)
+  +sprite-width($sprite)
+  +sprite-height($sprite)
+
+//sprite for retina
+=sprite-width-x2($sprite)
+  width: (nth($sprite, 5) / 2)
+
+=sprite-height-x2($sprite)
+  height: (nth($sprite, 6) / 2)
+
+=sprite-position-x2($sprite)
+  $sprite-offset-x: (nth($sprite, 3) / 2)
+  $sprite-offset-y: (nth($sprite, 4) / 2)
+  background-position: $sprite-offset-x  $sprite-offset-y
+
+=sprite-image-x2($sprite)
+  $sprite-image: nth($sprite, 9)
+  background-image: url(#{$sprite-image})
+
+=sprite-size-x2($sprite)
+  background-size: (nth($sprite, 7) / 2) (nth($sprite, 8) / 2)
+
+=sprite-x2($sprite)
+  +sprite-image-x2($sprite)
+  +sprite-position-x2($sprite)
+  +sprite-size-x2($sprite)
+  +sprite-width-x2($sprite)
+  +sprite-height-x2($sprite)
+
+=sprite-extend-x2($sprite)
+  +sprite-position-x2($sprite)
+  +sprite-width-x2($sprite)
+  +sprite-height-x2($sprite)
+
+// function
+@function stripunit($number)
+  @return $number / ($number * 0 + 1)
+
+// font
+
+// font-size: rem, line-height: unitless
+=font($px-size, $px-lh)
+  $size: stripunit($px-size)
+  $lh:  stripunit($px-lh)
+  font-size: 1rem * ($size / 10)
+  line-height: $lh / $size
+
+=retina-font($px-size, $px-lh)
+  $size: stripunit($px-size) / 2
+  $lh: stripunit($px-lh) / 2
+  font-size: 1rem * ($size / 10)
+  line-height: $lh / $size
+
+// other
+=hide-text($ta: 0)
+  overflow: hidden
+  text-indent: -9999px
+  @if $ta != 0
+    text-align: $ta
+
+=clearfix()
+  &:after
+    content: ""
+    display: block
+    clear: both
+
+=arrow($width: 35px, $rotate: 0deg)
+  display: block
+  $height: floor($width*1.457)
+  width: $width
+  height: $height
+  background-size: $width auto
+  transform: rotate($rotate)
+  transition: transform .25s ease-out
+
+=arrow-white($width: 35px, $rotate: 0deg)
+  +arrow($width, $rotate)
+  background-image: url("../img/arrow-white.svg")
+  background-repeat: no-repeat
+  background-position: 0 0
+
+=arrow-white-t($width: 35px)
+  +arrow-white($width, 0)
+
+=arrow-white-r($width: 35px)
+  +arrow-white($width, 90deg)
+
+=arrow-white-b($width: 35px)
+  +arrow-white($width, 180deg)
+
+=arrow-white-l($width: 35px)
+  +arrow-white($width, -90deg)

@@ -44,7 +44,7 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
     this.mkdir('src/jade');
     this.mkdir('src/jade/include');
     this.mkdir('src/stylus');
-    this.mkdir('src/coffee');
+    this.mkdir('src/sass');
 
     this.copy('_package.json', 'package.json');
     //this.copy('_Gruntfile.coffee', 'Gruntfile.coffee');
@@ -64,6 +64,11 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
     this.copy('stylus/style.styl', 'src/stylus/style.styl');
     this.copy('stylus/_function.styl', 'src/stylus/_function.styl');
     this.copy('stylus/_mixin.styl', 'src/stylus/_mixin.styl');
+    // sass
+    this.copy('sass/style.sass', 'src/sass/style.sass');
+    this.copy('sass/normalize.css', 'src/sass/normalize.css');
+    this.copy('sass/_mixin.sass', 'src/sass/_mixin.sass');
+    this.copy('sass/_var.sass', 'src/sass/_var.sass');
   }
 });
 

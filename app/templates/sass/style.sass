@@ -1,0 +1,51 @@
+@charset "UTF-8"
+
+// sprite
+//@import sprite/_sprite-main
+//@import sprite/_sprite-mobile
+
+@import _var
+@import _mixin
+@import normalize
+
+/*! Basic styles
+   ========================================================================== */
+
+html
+  height: 100%
+  color: black
+  font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", arial, helvetica, sans-serif;
+  font-size: 10px
+  line-height: 1.5
+
+body
+  height: 100%
+  >.container
+    position: relative
+    z-index: 0
+    min-height: 100%
+
+img, iframe
+  vertical-align: bottom
+
+.none,
+.mobile-only
+  display: none
+
+// components
+// for Desktop
+@import "components/_button"
+
+// for Tablet
+@media only screen and (max-width: 1199px) and (min-width: 768px)
+  @import "medium-components/_button"
+
+// for Mobile
+@media only screen and (max-width: 767px)
+  .desktop-only
+    display: none
+  .mobile-only
+    display: block
+
+  @import "mobile-components/_button"
+
