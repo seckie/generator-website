@@ -55,6 +55,7 @@ var WebsiteGenerator = yeoman.generators.Base.extend({
   projectfiles: function () {
     this.copy('editorconfig', '.editorconfig');
     this.copy('jshintrc', '.jshintrc');
+    this.copy('htmllintrc', '.htmllintrc');
 
     // jade
     this.copy('jade/base.jade', 'src/jade/include/base.jade');
