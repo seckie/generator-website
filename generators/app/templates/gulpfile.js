@@ -2,6 +2,7 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var _ = require('lodash');
+var path = require('path');
 
 var jade = require('gulp-jade');
 var stylus = require('gulp-stylus');
@@ -15,7 +16,7 @@ var notify = require('gulp-notify');
 var changed = require('gulp-changed');
 var data = require('gulp-data');
 var uglify = require('gulp-uglify');
-var rename = require("gulp-rename");
+var rename = require('gulp-rename');
 var spritesmith = require('gulp.spritesmith');
 
 var browserSync = require('browser-sync').create();
@@ -23,34 +24,35 @@ var browserSync = require('browser-sync').create();
 var PUBLIC_PATH = 'public/';
 
 var PATHS = {
-  jade: [ 'src/jade/*.jade' ],
-  jadeEntry: [ 'src/jade/**/!(_)*.jade' ],
-  html: [ PUBLIC_PATH + '**/*.html' ],
+  jade: ['src/jade/*.jade'],
+  jadeEntry: ['src/jade/**/!(_)*.jade'],
+  html: [PUBLIC_PATH + '**/*.html'],
   htmlDir: PUBLIC_PATH,
 
-  jsx: [ 'src/jsx/**/*.jsx' ],
+  jsx: ['src/jsx/**/*.jsx'],
   jsxMain: './src/jsx/main.jsx',
-  js: [ PUBLIC_PATH + 'js/**/*.js' ],
+  js: [PUBLIC_PATH + 'js/**/*.js'],
   jsDir: PUBLIC_PATH + 'js',
   jsMain: PUBLIC_PATH + 'js/main.js',
 
-  coffee: [ 'src/coffee/**/*.coffee' ],
+  coffee: ['src/coffee/**/*.coffee'],
   coffeeMain: './src/coffee/main.coffee',
 
-  stylus: [ 'src/stylus/**/*.styl' ],
-  stylusEntry: [ 'src/stylus/**/!(_)*.styl' ],
-  css: [ PUBLIC_PATH + 'css/**/*.css' ],
+  stylus: ['src/stylus/**/*.styl'],
+  stylusEntry: ['src/stylus/**/!(_)*.styl'],
+  css: [PUBLIC_PATH + 'css/**/*.css'],
   cssDir: PUBLIC_PATH + 'css',
 
-  spriteImg: [ 'src/sprite/*' ],
-  spriteImgName: [ 'main.png' ],
-  spriteCSSName: [ 'sprite-main.styl' ],
+  spriteImg: ['src/sprite/*'],
+  spriteImgName: ['main.png'],
+  spriteCSSName: ['sprite-main.styl'],
   spriteImgDest: PUBLIC_PATH + 'img/sprite',
   spriteCSSDest: 'src/stylus/sprite'
 };
 
 // utilities
-var errorHandler = function (e) {
+var errorHandler = function () {
+  // @param error
   var args = Array.prototype.slice.call(arguments);
   notify.onError({
     title: 'Compile Error',
@@ -73,40 +75,47 @@ gulp.task('jade-before-build', function (cb) {
 });
 gulp.task('jade', function () {
   return gulp.src(PATHS.jadeEntry)
-    .pipe(data(function (file) { return jadeData; }))
+    .pipe(data(function () {
+      // @param file
+      return jadeData;
+    }))
     .pipe(jade({
-        pretty: true,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
+      pretty: true,
+      locals: jadeLocalVar
+    }).on('error', errorHandler))
     .pipe(gulp.dest(PATHS.htmlDir));
 });
 gulp.task('jade-watch', function () {
   return gulp.src(PATHS.jadeEntry)
-    .pipe(changed(PATHS.htmlDir), { extension: '.html' })
-    .pipe(data(function (file) { return jadeData; }))
+    .pipe(changed(PATHS.htmlDir), {extension: '.html'})
+    .pipe(data(function () {
+      // @param file
+      return jadeData;
+    }))
     .pipe(jade({
-        pretty: true,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
+      pretty: true,
+      locals: jadeLocalVar
+    }).on('error', errorHandler))
     .pipe(gulp.dest(PATHS.htmlDir));
 });
 gulp.task('jade-deploy', function () {
   return gulp.src(PATHS.jadeEntry)
-    .pipe(data(function (file) {
-      return _.assign(jadeData, { min: true });
+    .pipe(data(function () {
+      // @param file
+      return _.assign(jadeData, {min: true});
     }))
     .pipe(jade({
-        pretty: false,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
+      pretty: false,
+      locals: jadeLocalVar
+    }).on('error', errorHandler))
     .pipe(gulp.dest(PATHS.htmlDir));
 });
 
 // build CSS
-var stylusData = { use: [ nib() ] };
+var stylusData = {use: [nib()]};
 gulp.task('stylus', function () {
   return gulp.src(PATHS.stylusEntry)
-    .pipe(changed(PATHS.cssDir), { extension: '.css' })
+    .pipe(changed(PATHS.cssDir), {extension: '.css'})
     .pipe(stylus(stylusData).on('error', errorHandler))
     .pipe(gulp.dest(PATHS.cssDir))
     .pipe(browserSync.stream());
@@ -117,7 +126,7 @@ gulp.task('coffee', function () {
   return gulp.src(PATHS.coffee)
     .pipe(coffee().on('error', errorHandler))
     .pipe(gulp.dest(PATHS.jsDir))
-    .pipe(browserSync.reload({ stream: true }));
+    .pipe(browserSync.reload({stream: true}));
 });
 gulp.task('jshint', function () {
   return gulp.src(PATHS.js)
@@ -128,19 +137,19 @@ gulp.task('jshint', function () {
 gulp.task('build', function () {
   return gulp.src(PATHS.jsxMain)
     .pipe(webpack({
-      output: { filename: '[name].js' },
+      output: {filename: '[name].js'},
       module: {
         loaders: [
-          { test: /\.jsx$/, exclude: /node_modules/, loader: 'babel-loader' }
+          {test: /\.jsx$/, exclude: /node_modules/, loader: 'babel-loader'}
         ],
         resolve: {
-          extensions: [ '', '.js', '.jsx' ]
+          extensions: ['', '.js', '.jsx']
         }
       },
       externals: {
-        'react': 'React',
+        react: 'React',
         'react/addons': 'React',
-        'immutable': 'Immutable',
+        immutable: 'Immutable'
       }
     }))
     .pipe(gulp.dest(PATHS.jsDir))
@@ -154,7 +163,7 @@ gulp.task('compress', function () {
       mangle: false,
       preserveComments: 'license'
     }))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(rename({suffix: '.min'}))
     .pipe(gulp.dest(PATHS.jsDir));
 });
 
@@ -168,7 +177,7 @@ gulp.task('sprite', function (cb) {
       imgPath: path + '/' + PATHS.spriteImgName[i],
       algorithm: 'binary-tree',
       engine: 'gmsmith',
-      imgOpts: { exportOpts: { quality: 100 } },
+      imgOpts: {exportOpts: {quality: 100}},
       padding: 2
     }).on('error', errorHandler);
     var spriteData = gulp.src(src).pipe(stream);
@@ -181,7 +190,7 @@ gulp.task('sprite', function (cb) {
 // test
 gulp.task('test', function (cb) {
   return karma.start({
-    configFile: __dirname + '/karma.conf.js'
+    configFile: path.join(__dirname, '/karma.conf.js')
   }, cb);
 });
 
@@ -189,7 +198,7 @@ gulp.task('test', function (cb) {
 gulp.task('browser-sync', function () {
   browserSync.init({
     open: false,
-    //files: [ PATHS.css, PATHS.js, PATHS.jade ],
+    // files: [PATHS.css, PATHS.js, PATHS.jade],
     server: {
       baseDir: './public',
       middleware: [
@@ -212,13 +221,12 @@ gulp.task('browser-sync', function () {
 // watch
 gulp.task('watch', function () {
   gutil.log('start watching');
-  gulp.watch(PATHS.jade, [ 'jade-before-build', 'jade-watch' ])
+  gulp.watch(PATHS.jade, ['jade-before-build', 'jade-watch'])
     .on('change', browserSync.reload);
-  gulp.watch(PATHS.stylus, [ 'stylus' ]);
-  gulp.watch(PATHS.jsx, [ 'build' ]);
+  gulp.watch(PATHS.stylus, ['stylus']);
+  gulp.watch(PATHS.jsx, ['build']);
 });
 
-
 // commands
-gulp.task('default', [ 'browser-sync', 'stylus', 'jade-before-build', 'jade-watch', 'watch' ]);
-gulp.task('deploy', [ 'jade-before-build', 'jade-deploy', ]);
+gulp.task('default', ['browser-sync', 'stylus', 'jade-before-build', 'jade-watch', 'watch']);
+gulp.task('deploy', ['jade-before-build', 'jade-deploy']);

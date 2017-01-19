@@ -10,9 +10,9 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: "test/**/*.jsx", watched: false },
+      {pattern: 'test/**/*.jsx', watched: false},
       'test/lib/*.js',
-      { pattern: "public/data/**/*.json", watched: false, included: false, served: true }
+      {pattern: 'public/data/**/*.json', watched: false, included: false, served: true}
     ],
 
     // preprocess matching files before serving them to the browser
@@ -50,9 +50,9 @@ module.exports = function (config) {
 
     // webpack setting
     plugins: [
-      require("karma-webpack"),
-      require("karma-jasmine"),
-      require("karma-chrome-launcher")
+      require('karma-webpack'),
+      require('karma-jasmine'),
+      require('karma-chrome-launcher')
     ],
     webpack: {
       module: {
@@ -61,13 +61,13 @@ module.exports = function (config) {
             test: /\.jsx?$/,
             exclude: /node_modules/,
             loader: 'babel',
-            query: { presets: [ "react", "es2015" ] }
+            query: {presets: ['react', 'es2015']}
           }
         ]
       },
       resolve: {
-        root: [ path.join(__dirname) ],
-        extensions: [ "", ".js", ".jsx" ]
+        root: [__dirname],
+        extensions: ['', '.js', '.jsx']
       }
     },
     webpackMiddleware: {
