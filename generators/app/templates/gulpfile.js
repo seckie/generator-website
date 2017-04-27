@@ -1,18 +1,18 @@
 'use strict';
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var path = require('path');
+// var path = require('path');
 
 var sass = require('gulp-sass');
-//var stylus = require('gulp-stylus');
-//var nib = require('nib');
+// var stylus = require('gulp-stylus');
+// var nib = require('nib');
 var webpack = require('webpack');
 var gulpWebpack = require('gulp-webpack');
 var eslint = require('gulp-eslint');
 var pug = require('gulp-pug');
 
-//var karma = require('karma').server;
-//var spritesmith = require('gulp.spritesmith');
+// var karma = require('karma').server;
+// var spritesmith = require('gulp.spritesmith');
 
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
@@ -48,37 +48,36 @@ var PATHS = {
 };
 
 // methods
-function errorHandler (err, stats) {
+function errorHandler(err, stats) {
   if (err || (stats && stats.compilation.errors.length > 0)) {
     const error = err || stats.compilation.errors[0].error;
-    notify.onError({ message: '<%= error.message %>' })(error);
+    notify.onError({message: '<%= error.message %>'})(error);
   }
 }
 
 // build HTML
 gulp.task('pug', function () {
   return gulp.src(PATHS.pugSrc)
-    .pipe(plumber({ errorHandler: errorHandler }))
-    .pipe(pug({ pretty: true }))
+    .pipe(plumber({errorHandler: errorHandler}))
+    .pipe(pug({pretty: true}))
     .pipe(gulp.dest(PATHS.htmlDir));
 });
 
 // build CSS
 gulp.task('sass', function () {
   return gulp.src(PATHS.sass)
-    .pipe(plumber({ errorHandler: errorHandler }))
-    .pipe(sass({ outputStyle: 'expanded' }))
+    .pipe(plumber({errorHandler: errorHandler}))
+    .pipe(sass({outputStyle: 'expanded'}))
     .pipe(gulp.dest(PATHS.cssDir))
     .pipe(browserSync.stream());
 });
-//gulp.task('stylus', function () {
-//  return gulp.src(PATHS.stylusSrc)
-//    .pipe(plumber({ errorHandler: errorHandler }))
-//    .pipe(stylus({use: [nib()]}))
-//    .pipe(gulp.dest(PATHS.cssDir))
-//    .pipe(browserSync.stream());
-//});
-
+// gulp.task('stylus', function () {
+//   return gulp.src(PATHS.stylusSrc)
+//     .pipe(plumber({ errorHandler: errorHandler }))
+//     .pipe(stylus({use: [nib()]}))
+//     .pipe(gulp.dest(PATHS.cssDir))
+//     .pipe(browserSync.stream());
+// });
 
 // build JavaScript
 
@@ -91,7 +90,7 @@ gulp.task('eslint', function () {
 
   // webpack
 var WEBPACK_OPT = {
-  entry: { script: PATHS.jsSrcMain },
+  entry: {script: PATHS.jsSrcMain},
   output: {filename: '[name].js'},
   module: {
     loaders: [
@@ -111,7 +110,7 @@ gulp.task('build', function () {
 });
 
 var WEBPACK_COMPRESS_OPT = {
-  output: { filename: '[name].min.js' },
+  output: {filename: '[name].min.js'},
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
@@ -119,7 +118,7 @@ var WEBPACK_COMPRESS_OPT = {
       }
     }),
     new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
+      compress: {warnings: false},
       comments: function (astNode, comment) {
         return /^!\*?/.test(comment.value) ||
                /(@preserve|@license|Copyright)/.test(comment.value);
@@ -137,31 +136,31 @@ gulp.task('compress', function () {
 });
 
 // sprite
-gulp.task('sprite', function (cb) {
-  var path = (PATHS.spriteImgDest).replace(PUBLIC_PATH, '/');
-  PATHS.spriteImg.forEach(function (src, i) {
-    var stream = spritesmith({
-      imgName: PATHS.spriteImgName[i],
-      cssName: PATHS.spriteCSSName[i],
-      imgPath: path + '/' + PATHS.spriteImgName[i],
-      algorithm: 'binary-tree',
-      engine: 'gmsmith',
-      imgOpts: {exportOpts: {quality: 100}},
-      padding: 2
-    }).on('error', errorHandler);
-    var spriteData = gulp.src(src).pipe(stream);
-    spriteData.img.pipe(gulp.dest(PATHS.spriteImgDest));
-    spriteData.css.pipe(gulp.dest(PATHS.spriteCSSDest));
-  });
-  return cb();
-});
+// gulp.task('sprite', function (cb) {
+//   var path = (PATHS.spriteImgDest).replace(PUBLIC_PATH, '/');
+//   PATHS.spriteImg.forEach(function (src, i) {
+//     var stream = spritesmith({
+//       imgName: PATHS.spriteImgName[i],
+//       cssName: PATHS.spriteCSSName[i],
+//       imgPath: path + '/' + PATHS.spriteImgName[i],
+//       algorithm: 'binary-tree',
+//       engine: 'gmsmith',
+//       imgOpts: {exportOpts: {quality: 100}},
+//       padding: 2
+//     }).on('error', errorHandler);
+//     var spriteData = gulp.src(src).pipe(stream);
+//     spriteData.img.pipe(gulp.dest(PATHS.spriteImgDest));
+//     spriteData.css.pipe(gulp.dest(PATHS.spriteCSSDest));
+//   });
+//   return cb();
+// });
 
 // test
-//gulp.task('test', function (cb) {
-//  return karma.start({
-//    configFile: path.join(__dirname, '/karma.conf.js')
-//  }, cb);
-//});
+// gulp.task('test', function (cb) {
+//   return karma.start({
+//     configFile: path.join(__dirname, '/karma.conf.js')
+//   }, cb);
+// });
 
 // server
 gulp.task('browser-sync', function () {
@@ -190,7 +189,7 @@ gulp.task('browser-sync', function () {
 gulp.task('watch', function () {
   gutil.log('start watching');
   gulp.watch(PATHS.pug, ['pug']);
-  //gulp.watch(PATHS.stylus, ['stylus']);
+  // gulp.watch(PATHS.stylus, ['stylus']);
   gulp.watch(PATHS.sass, ['sass']);
   gulp.watch(PATHS.jsSrc, ['eslint', 'build']);
   gulp.watch([GULPFILE_PATH], ['eslint']);
