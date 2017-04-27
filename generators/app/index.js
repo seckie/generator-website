@@ -29,7 +29,6 @@ module.exports = Generator.extend({
       ['gulpfile.js', 'gulpfile.js'],
       ['karma.conf.js', 'karma.conf.js'],
       ['editorconfig', '.editorconfig'],
-      ['jshintrc', '.jshintrc'],
       ['htmllintrc', '.htmllintrc'],
       ['babelrc', '.babelrc'],
       ['gitignore', '.gitignore'],
