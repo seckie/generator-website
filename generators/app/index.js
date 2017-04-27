@@ -25,16 +25,17 @@ module.exports = Generator.extend({
 
   writing: function () {
     var files = [
-      ['_package.json', 'package.json'],
+      ['package.json', 'package.json'],
       ['gulpfile.js', 'gulpfile.js'],
       ['karma.conf.js', 'karma.conf.js'],
       ['editorconfig', '.editorconfig'],
       ['htmllintrc', '.htmllintrc'],
       ['babelrc', '.babelrc'],
       ['gitignore', '.gitignore'],
-      // jade
-      ['jade/base.jade', 'src/jade/include/base.jade'],
-      ['jade/index.jade', 'src/jade/index.jade'],
+      ['eslintrc.json', '.eslintrc.json'],
+      // pug
+      ['pug/include/_base.pug', 'src/pug/include/_base.pug'],
+      ['pug/index.pug', 'src/pug/index.pug'],
       // stylus
       ['stylus/style.styl', 'src/stylus/style.styl'],
       ['stylus/_function.styl', 'src/stylus/_function.styl'],
@@ -51,6 +52,7 @@ module.exports = Generator.extend({
         this.destinationPath(file[1])
       );
     });
+    this.fs.write('public/empty', '');
   },
 
   install: function () {
