@@ -6,16 +6,16 @@ var gutil = require('gulp-util');
 var sass = require('gulp-sass');
 // var stylus = require('gulp-stylus');
 // var nib = require('nib');
-var webpack = require('webpack');
-var gulpWebpack = require('gulp-webpack');
 var eslint = require('gulp-eslint');
 var pug = require('gulp-pug');
 
+var exec = require('child_process').exec;
 // var karma = require('karma').server;
 // var spritesmith = require('gulp.spritesmith');
 
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
+var autoprefixer = require('gulp-autoprefixer');
 var browserSync = require('browser-sync').create();
 
 var PUBLIC_PATH = 'public/';
@@ -62,12 +62,25 @@ gulp.task('pug', function () {
     .pipe(pug({pretty: true}))
     .pipe(gulp.dest(PATHS.htmlDir));
 });
+gulp.task('pug-dist', function () {
+  return gulp.src(PATHS.pugSrc)
+    .pipe(plumber({errorHandler: errorHandler}))
+    .pipe(pug({
+      pretty: true,
+      locals: {env: 'production'}
+    }))
+    .pipe(gulp.dest(PATHS.htmlDir));
+});
 
 // build CSS
 gulp.task('sass', function () {
   return gulp.src(PATHS.sass)
     .pipe(plumber({errorHandler: errorHandler}))
     .pipe(sass({outputStyle: 'expanded'}))
+    .pipe(autoprefixer({
+      browsers: ['last 2 versions'],
+      cascade: false
+    }))
     .pipe(gulp.dest(PATHS.cssDir))
     .pipe(browserSync.stream());
 });
@@ -88,52 +101,23 @@ gulp.task('eslint', function () {
     .pipe(eslint.failAfterError());
 });
 
-  // webpack
-var WEBPACK_OPT = {
-  entry: {script: PATHS.jsSrcMain},
-  output: {filename: '[name].js'},
-  module: {
-    loaders: [
-      {test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader'}
-    ],
-    resolve: {
-      extensions: ['', '.js', '.jsx']
-    }
-  },
-  externals: { }
-};
-gulp.task('build', function () {
-  return gulp.src(PATHS.jsSrcMain)
-    .pipe(gulpWebpack(WEBPACK_OPT, null, errorHandler))
-    .pipe(gulp.dest(PATHS.jsDir))
-    .pipe(browserSync.stream());
+gulp.task('webpack', function (cb) {
+  exec('npm run webpack', function (err, stdout) {
+    if (err) { return cb(err); }
+    gutil.log(stdout);
+    browserSync.reload();
+    cb();
+  });
+});
+gulp.task('webpack-production', function (cb) {
+  exec('npm run webpack-production', function (err, stdout) {
+    if (err) { return cb(err); }
+    gutil.log(stdout);
+    browserSync.reload();
+    cb();
+  });
 });
 
-var WEBPACK_COMPRESS_OPT = {
-  output: {filename: '[name].min.js'},
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production')
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {warnings: false},
-      comments: function (astNode, comment) {
-        return /^!\*?/.test(comment.value) ||
-               /(@preserve|@license|Copyright)/.test(comment.value);
-      },
-      mangle: false
-    })
-  ]
-};
-gulp.task('compress', function () {
-  var opt = Object.assign({}, WEBPACK_OPT, WEBPACK_COMPRESS_OPT);
-  return gulp.src(PATHS.jsSrcMain)
-    .pipe(gulpWebpack(opt, null, errorHandler))
-    .pipe(gulp.dest(PATHS.jsDir))
-    .pipe(browserSync.stream());
-});
 
 // sprite
 // gulp.task('sprite', function (cb) {
@@ -191,9 +175,10 @@ gulp.task('watch', function () {
   gulp.watch(PATHS.pug, ['pug']);
   // gulp.watch(PATHS.stylus, ['stylus']);
   gulp.watch(PATHS.sass, ['sass']);
-  gulp.watch(PATHS.jsSrc, ['eslint', 'build']);
+  gulp.watch(PATHS.jsSrc, ['eslint', 'webpack']);
   gulp.watch([GULPFILE_PATH], ['eslint']);
 });
 
 // commands
 gulp.task('default', ['browser-sync', 'sass', 'pug', 'watch']);
+gulp.task('dist', ['sass', 'pug-dist', 'webpack-production']);

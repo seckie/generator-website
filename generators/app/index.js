@@ -38,6 +38,8 @@ module.exports = Generator.extend({
       ['babelrc', '.babelrc'],
       ['gitignore', '.gitignore'],
       ['eslintrc.json', '.eslintrc.json'],
+      ['webpack.development.js', 'webpack.development.js'],
+      ['webpack.production.js', 'webpack.production.js'],
       // pug
       ['pug/include/_base.pug', 'src/pug/include/_base.pug'],
       ['pug/index.pug', 'src/pug/index.pug'],
